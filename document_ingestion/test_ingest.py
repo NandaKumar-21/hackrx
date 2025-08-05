@@ -10,7 +10,7 @@ for file_name in file_list:
             text = extract_text(file_name)
 
             if text.strip():
-                print(text[:1000])
+                print(text[:1000])  # Preview only first 1000 characters
             else:
                 print(f"No readable text in: {file_name}")
 

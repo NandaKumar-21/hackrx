@@ -5,15 +5,13 @@ from schema import ParsedQuery
 from search_engine import find_most_relevant_chunk
 from answer_generator import generate_answer
 import json
-import os
 
-st.title(" LLM-Powered Intelligent Query–Retrieval System ")
+st.title("LLM-Powered Intelligent Query–Retrieval System")
 
-uploaded_file = st.file_uploader("Upload a document (PDF, DOCX, or EML)", type=["pdf", "docx", "eml"])
+uploaded_file = st.file_uploader("Upload document (PDF, DOCX, EML)", type=["pdf", "docx", "eml"])
 user_query = st.text_input("Ask your question:")
 
 if uploaded_file and user_query:
-    # Save file temporarily
     with open(uploaded_file.name, "wb") as f:
         f.write(uploaded_file.read())
 
@@ -27,13 +25,11 @@ if uploaded_file and user_query:
         lines = [line.strip() for line in document_text.split('\n') if len(line.strip()) > 30]
         chunks = [' '.join(lines[i:i+3]) for i in range(0, len(lines), 3)]
 
-        best_chunks, scores = find_most_relevant_chunk(search_query, chunks)
-        best_answer = best_chunks[0]
+        best_chunks, _ = find_most_relevant_chunk(search_query, chunks)
+        final_answer = generate_answer(user_query, best_chunks[0])
 
-        final_answer = generate_answer(user_query, best_answer)
-
-        st.subheader(" Final Answer:")
+        st.subheader("Final Answer:")
         st.success(final_answer)
 
     except Exception as e:
-        st.error(f" Error: {e}")
+        st.error(f"Error: {e}")
