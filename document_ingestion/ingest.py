@@ -1,6 +1,7 @@
 import pdfplumber
 import docx
-import mailparser
+import email
+from bs4 import BeautifulSoup
 
 def extract_from_pdf(file_path):
     text = ""
@@ -26,8 +27,24 @@ def extract_from_docx(file_path):
 def extract_from_email(file_path):
     text = ""
     try:
-        mail = mailparser.parse_from_file(file_path)
-        text = mail.body
+        with open(file_path, 'r', encoding='utf-8') as f:
+            raw_email = f.read()
+        msg = email.message_from_string(raw_email)
+
+        if msg.is_multipart():
+            for part in msg.walk():
+                content_type = part.get_content_type()
+                if content_type == "text/plain":
+                    text = part.get_payload(decode=True).decode(errors='ignore')
+                    break
+                elif content_type == "text/html":
+                    html_content = part.get_payload(decode=True).decode(errors='ignore')
+                    soup = BeautifulSoup(html_content, 'html.parser')
+                    text = soup.get_text()
+                    break
+        else:
+            text = msg.get_payload(decode=True).decode(errors='ignore')
+
     except Exception as e:
         print(f"Error reading EML: {e}")
     return text
