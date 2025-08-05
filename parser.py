@@ -1,5 +1,5 @@
 import cohere
-import re
+import json
 
 co = cohere.Client("korv6munGd0a3gPtoheXu3uHR6vw8xvhucrKYWae")
 
@@ -16,9 +16,7 @@ You are a JSON API builder. Based on the document and the user query, respond wi
 }}
 
 Document:
-\"\"\"
-{document_text}
-\"\"\"
+\"\"\"{document_text}\"\"\"
 
 User Query:
 \"{user_query}\"
@@ -39,8 +37,17 @@ Rules:
         model="command-r"
     )
 
+    # Ensure raw output is clean and JSON-parsable
     raw = response.text.strip()
 
-    cleaned = re.sub(r"^```json|```$", "", raw, flags=re.MULTILINE).strip()
-
-    return cleaned
+    try:
+        # Try to directly parse JSON to validate
+        parsed = json.loads(raw)
+        return parsed
+    except json.JSONDecodeError:
+        # Fallback: remove markdown wrappers if any
+        raw_cleaned = raw.strip('`').strip()
+        try:
+            return json.loads(raw_cleaned)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to parse model output as JSON:\n\n{raw}") from e
