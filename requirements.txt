@@ -1,9 +1,9 @@
 fastapi
 uvicorn
-pydantic
 cohere
+pydantic
 python-docx
-PyPDF2
-streamlit
-scikit-learn
+pdfplumber
+beautifulsoup4
+lxml
 numpy
