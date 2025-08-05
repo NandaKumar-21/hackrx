@@ -1,28 +1,24 @@
-# answer_generator.py
 import cohere
 
-co = cohere.Client("korv6munGd0a3gPtoheXu3uHR6vw8xvhucrKYWae")  # Use your actual key
+co = cohere.Client("korv6munGd0a3gPtoheXu3uHR6vw8xvhucrKYWae")  # use your key
 
-def generate_answer(user_query, relevant_text):
+def generate_answer(user_query, relevant_chunk):
     prompt = f"""
-You are an assistant. Based on the document content, answer the user's question clearly and briefly.
+Use the below document excerpt to answer the user's query clearly.
 
-Document Section:
-\"\"\"
-{relevant_text}
-\"\"\"
+Document:
+\"\"\"{relevant_chunk}\"\"\"
 
-User Question:
-{user_query}
+Question:
+\"{user_query}\"
 
-Give a clean answer based only on the document.
-"""
+Answer:"""
 
-    response = co.chat(
-        message=prompt,
+    response = co.generate(
         model="command-r",
-        temperature=0.4
+        prompt=prompt,
+        temperature=0.3,
+        max_tokens=300
     )
 
-    return response.text.strip()
-
+    return response.generations[0].text.strip()
