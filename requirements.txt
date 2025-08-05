@@ -4,3 +4,5 @@ cohere
 pydantic
 python-docx
 pdfplumber
+mailparser
+numpy
