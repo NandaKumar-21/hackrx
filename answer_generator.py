@@ -8,11 +8,13 @@ import os
 # 2. Get your free API key from https://aistudio.google.com/
 # 3. Paste your API key below.
 # It's even better to set it as an environment variable for security.
-# genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 GEMINI_API_KEY = "AIzaSyDoUBWSSJwm3iSwTD5VKIG8EHB-6qDIoQk"
 
-if not GEMINI_API_KEY or GEMINI_API_KEY == "AIzaSyDoUBWSSJwm3iSwTD5VKIG8EHB-6qDIoQk":
+# This check ensures the key has been changed from the default placeholder.
+# This was the line with the error. It is now corrected.
+if not GEMINI_API_KEY or GEMINI_API_KEY == "PASTE_YOUR_GEMINI_API_KEY_HERE":
     raise ValueError("Please paste your Gemini API key into the GEMINI_API_KEY variable.")
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -70,4 +72,3 @@ Answer:"""
     except Exception as e:
         print(f"An error occurred while calling the Gemini API: {e}")
         raise Exception(f"Failed to generate answer from Gemini. Error: {e}")
-
