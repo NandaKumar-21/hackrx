@@ -1,17 +1,57 @@
-# answer_generator.py
+# answer_generator.py (for Google Gemini Pro)
 
-import cohere
+import google.generativeai as genai
 import os
 
-# It's better practice to load keys from environment variables
-# than to hardcode them directly in the script.
-# co = cohere.Client(os.environ.get("COHERE_API_KEY"))
-# For now, we will use the key you provided.
-co = cohere.Client("korv6munGd0a3gPtoheXu3uHR6vw8xvhucrKYWae")
+# --- IMPORTANT ---
+# 1. Run `pip install google-generativeai` in your terminal.
+# 2. Get your free API key from https://aistudio.google.com/
+# 3. Paste your API key below.
+# It's even better to set it as an environment variable for security.
+# genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+GEMINI_API_KEY = "AIzaSyDoUBWSSJwm3iSwTD5VKIG8EHB-6qDIoQk"
+
+if not GEMINI_API_KEY or GEMINI_API_KEY == "AIzaSyDoUBWSSJwm3iSwTD5VKIG8EHB-6qDIoQk":
+    raise ValueError("Please paste your Gemini API key into the GEMINI_API_KEY variable.")
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Configuration for the generative model
+generation_config = {
+  "temperature": 0.3,
+  "top_p": 1,
+  "top_k": 1,
+  "max_output_tokens": 300,
+}
+
+# Safety settings to avoid harmful content
+safety_settings = [
+  {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+]
+
+model = genai.GenerativeModel(model_name="gemini-pro",
+                              generation_config=generation_config,
+                              safety_settings=safety_settings)
 
 def generate_answer(user_query, relevant_chunk):
     """
-    Generates an answer using a Cohere model based on a user query and a relevant text chunk.
+    Generates an answer using the Gemini Pro model.
     """
     prompt = f"""
 Use the below document excerpt to answer the user's query clearly and concisely.
@@ -25,31 +65,9 @@ Question:
 Answer:"""
 
     try:
-        # Attempt to use the 'command-r' model first.
-        response = co.generate(
-            model="command-r",
-            prompt=prompt,
-            temperature=0.3,
-            max_tokens=300
-        )
-        return response.generations[0].text.strip()
-        
-    except cohere.CohereAPIError as e:
-        # If 'command-r' is not supported, print a helpful message and try a fallback model.
-        print(f"Warning: Model 'command-r' failed with error: {e}")
-        print("Attempting to use fallback model 'command-light'.")
-        
-        try:
-            # Fallback to a more widely available model for debugging.
-            response = co.generate(
-                model="command-light",
-                prompt=prompt,
-                temperature=0.3,
-                max_tokens=300
-            )
-            return response.generations[0].text.strip()
-        except cohere.CohereAPIError as fallback_e:
-            # If the fallback also fails, then the issue is likely the API key or connection.
-            print(f"Fallback model also failed: {fallback_e}")
-            raise Exception("Both primary and fallback models failed. Please check your API key and account permissions.") from fallback_e
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"An error occurred while calling the Gemini API: {e}")
+        raise Exception(f"Failed to generate answer from Gemini. Error: {e}")
 
