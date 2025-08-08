@@ -26,8 +26,10 @@ async def run_pipeline(submission: Submission):
         document_text = extract_text(file_path)
 
         # Parse query and format
+
         raw_json = query_to_json(submission.query, document_text)
-        json_dict = raw_json
+        parsed = ParsedQuery.model_validate(raw_json)
+
 
         parsed = ParsedQuery.model_validate(json_dict)
 
