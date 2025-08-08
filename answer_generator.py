@@ -13,7 +13,6 @@ import os
 GEMINI_API_KEY = "AIzaSyDoUBWSSJwm3iSwTD5VKIG8EHB-6qDIoQk"
 
 # This check ensures the key has been changed from the default placeholder.
-# This was the line with the error. It is now corrected.
 if not GEMINI_API_KEY or GEMINI_API_KEY == "PASTE_YOUR_GEMINI_API_KEY_HERE":
     raise ValueError("Please paste your Gemini API key into the GEMINI_API_KEY variable.")
 
@@ -47,7 +46,8 @@ safety_settings = [
   },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-pro",
+# The model name has been updated to be more specific to fix the 404 error.
+model = genai.GenerativeModel(model_name="gemini-1.0-pro",
                               generation_config=generation_config,
                               safety_settings=safety_settings)
 
