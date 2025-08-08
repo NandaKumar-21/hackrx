@@ -7,3 +7,4 @@ pdfplumber
 beautifulsoup4
 lxml
 numpy
+google-generativeai
