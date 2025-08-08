@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-import json
 import os
 
 from document_ingestion.ingest import extract_text
@@ -26,11 +25,7 @@ async def run_pipeline(submission: Submission):
         document_text = extract_text(file_path)
 
         # Parse query and format
-
-        raw_json = query_to_json(submission.query, document_text)
-        parsed = ParsedQuery.model_validate(raw_json)
-
-
+        json_dict = query_to_json(submission.query, document_text)
         parsed = ParsedQuery.model_validate(json_dict)
 
         # Form search query
